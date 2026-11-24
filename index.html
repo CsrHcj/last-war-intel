@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Last War — Top 5 Server Intel (#1829–#1860)</title>
+  <style>
+    :root {
+      --bg: #0d131c;
+      --panel: #151e2b;
+      --panel-2: #1d2838;
+      --border: #2b3a4f;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --gold: #fbbf24;
+      --silver: #cbd5e1;
+      --bronze: #d97706;
+      --tank: #4ade80;
+      --air: #60a5fa;
+      --missile: #f87171;
+      --tbd: #cbd5e1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 18px;
+      line-height: 1.45;
+    }
+
+    .container { max-width: 1280px; margin: 0 auto; }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    h1 { font-size: 1.4rem; font-weight: 700; }
+    .subtitle { color: var(--muted); font-size: 0.9rem; }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 12px;
+    }
+
+    .stat-card .label { font-size: 0.76rem; color: var(--muted); text-transform: uppercase; }
+    .stat-card .val { font-size: 1.05rem; font-weight: 700; margin-top: 2px; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 10px;
+      background: var(--panel);
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 940px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .table-wrap {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      padding: 9px 11px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      position: sticky;
+      top: 0;
+    }
+
+    tbody tr { cursor: pointer; transition: background 0.12s ease; }
+    tbody tr:hover { background: rgba(56, 189, 248, 0.09); }
+    tbody tr.active { background: rgba(56, 189, 248, 0.18); }
+
+    .rank-1 { color: var(--gold); font-weight: 700; }
+    .rank-2 { color: var(--silver); font-weight: 700; }
+    .rank-3 { color: var(--bronze); font-weight: 700; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+    }
+
+    .sq-Tank { color: var(--tank); border-color: rgba(74, 222, 128, 0.35); }
+    .sq-Aircraft { color: var(--air); border-color: rgba(96, 165, 250, 0.35); }
+    .sq-Missile { color: var(--missile); border-color: rgba(248, 113, 113, 0.35); }
+    .sq-TBD { color: var(--tbd); border-color: rgba(148, 163, 184, 0.35); }
+
+    .inspector {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      position: sticky;
+      top: 18px;
+    }
+
+    .inspector h2 {
+      font-size: 1.05rem;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      word-break: break-word;
+    }
+
+    .field {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+      font-size: 0.88rem;
+    }
+
+    .field span:first-child { color: var(--muted); }
+    .field span:last-child { font-weight: 600; text-align: right; }
+
+    .note-box {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 7px;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fde68a;
+      font-size: 0.84rem;
+    }
+
+    .empty-msg { color: var(--muted); font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Last War: Top 5 Server Database (#1829–#1860)</h1>
+        <div class="subtitle">Excludes #1848 &amp; #1851 (30 servers · 150 players) — Tap or click any player for full details</div>
+      </div>
+      <div class="subtitle" id="countLabel">150 players</div>
+    </header>
+
+    <div class="stats-bar" id="statsBar"></div>
+
+    <div class="controls">
+      <input id="searchInput" type="text" placeholder="Search player, alliance, country, note..." />
+      <select id="serverFilter">
+        <option value="ALL">All Servers (30)</option>
+      </select>
+      <select id="squadFilter">
+        <option value="ALL">All Main Squads</option>
+        <option value="Tank">Tank</option>
+        <option value="Aircraft">Aircraft</option>
+        <option value="Missile">Missile</option>
+        <option value="TBD">TBD</option>
+      </select>
+      <select id="countryFilter">
+        <option value="ALL">All Nationalities</option>
+      </select>
+      <select id="sortSelect">
+        <option value="default">Sort: Server &amp; Rank</option>
+        <option value="powerDesc">Sort: Power (High to Low)</option>
+        <option value="killsDesc">Sort: Kills (High to Low)</option>
+      </select>
+    </div>
+
+    <div class="layout">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Server</th>
+              <th>#</th>
+              <th>Player</th>
+              <th>Alliance</th>
+              <th>Power</th>
+              <th>Main Squad</th>
+              <th>Nationality</th>
+              <th>Kills</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <aside class="inspector" id="inspector">
+        <h2>Player Details</h2>
+        <p class="empty-msg">Tap or click a player row to inspect their full profile.</p>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const players = [
+      // 1829
+      { server: 1829, rank: 1, name: "lllllllllllllll", alliance: "xRKB", power: 234231801, nationality: "South Korea", kills: "38.9M", killsNum: 38.9, squad: "Missile" },
+      { server: 1829, rank: 2, name: "SeaBae", alliance: "xRKB", power: 198723616, nationality: "United States", kills: "35.2M", killsNum: 35.2, squad: "Missile" },
+      { server: 1829, rank: 3, name: "dUbU", alliance: "xRKB", power: 197754012, nationality: "South Korea", kills: "31.6M", killsNum: 31.6, squad: "Missile" },
+      { server: 1829, rank: 4, name: "♡ nebz ♡", alliance: "xRKB", power: 194103063, nationality: "United States", kills: "49.9M", killsNum: 49.9, squad: "Aircraft" },
+      { server: 1829, rank: 5, name: "나무인테리어", alliance: "xRKB", power: 179766779, nationality: "South Korea", kills: "18.6M", killsNum: 18.6, squad: "Aircraft" },
+
+      // 1830
+      { server: 1830, rank: 1, name: "ᴸᴵᴸLoki", alliance: "SM3P", power: 156800465, nationality: "Philippines", kills: "12.2M", killsNum: 12.2, squad: "Aircraft" },
+      { server: 1830, rank: 2, name: "小兔珍", alliance: "SM3P", power: 144777376, nationality: "No flag (Asian profile)", kills: "5.2M", killsNum: 5.2, squad: "Tank" },
+      { server: 1830, rank: 3, name: "iTonkz", alliance: "THEV", power: 136701635, nationality: "Thailand", kills: "13.6M", killsNum: 13.6, squad: "Aircraft" },
+      { server: 1830, rank: 4, name: "Osyra づ", alliance: "LITZ", power: 133681257, nationality: "Japan", kills: "6.3M", killsNum: 6.3, squad: "Tank" },
+      { server: 1830, rank: 5, name: "GTA07", alliance: "LITZ", power: 133281197, nationality: "Philippines", kills: "5.0M", killsNum: 5.0, squad: "Missile" },
+
+      // 1831
+      { server: 1831, rank: 1, name: "Floki ッ", alliance: "M4GR", power: 182610367, nationality: "Turkey", kills: "41.8M", killsNum: 41.8, squad: "Tank" },
+      { server: 1831, rank: 2, name: "Marian7907", alliance: "WPL", power: 169200775, nationality: "Poland", kills: "4.2M", killsNum: 4.2, squad: "Aircraft" },
+      { server: 1831, rank: 3, name: "leamathis", alliance: "M4GR", power: 142911115, nationality: "France", kills: "19.1M", killsNum: 19.1, squad: "Aircraft" },
+      { server: 1831, rank: 4, name: "loskokosᵀᴳᵒᴰ", alliance: "PoBd", power: 140435183, nationality: "Czech Republic", kills: "16.9M", killsNum: 16.9, squad: "Aircraft" },
+      { server: 1831, rank: 5, name: "Weeload", alliance: "SARZ", power: 139981728, nationality: "Denmark", kills: "5.9M", killsNum: 5.9, squad: "Tank" },
+
+      // 1832
+      { server: 1832, rank: 1, name: "LevBogdanAlex", alliance: "AvA1", power: 152320397, nationality: "No flag", kills: "15.5M", killsNum: 15.5, squad: "Tank" },
+      { server: 1832, rank: 2, name: "H E K İ M O Ğ L U", alliance: "LOCA", power: 147593289, nationality: "Turkey", kills: "21.4M", killsNum: 21.4, squad: "Aircraft" },
+      { server: 1832, rank: 3, name: "HeyDana", alliance: "BBBI", power: 139235933, nationality: "Poland", kills: "34.5M", killsNum: 34.5, squad: "Tank" },
+      { server: 1832, rank: 4, name: "Metatron MT", alliance: "LOCA", power: 129181986, nationality: "Turkey", kills: "9.8M", killsNum: 9.8, squad: "Tank" },
+      { server: 1832, rank: 5, name: "B E Y A Z A T E Ş", alliance: "LOCA", power: 129066758, nationality: "Turkey", kills: "9.6M", killsNum: 9.6, squad: "Tank" },
+
+      // 1833
+      { server: 1833, rank: 1, name: "Dark Bado", alliance: "KnRl", power: 238969199, nationality: "Turkey", kills: "30.3M", killsNum: 30.3, squad: "Missile" },
+      { server: 1833, rank: 2, name: "Gökhan  Paşa", alliance: "KnRl", power: 218879206, nationality: "Turkey", kills: "26.0M", killsNum: 26.0, squad: "Tank" },
+      { server: 1833, rank: 3, name: "Varacolachi", alliance: "RoNa", power: 206893196, nationality: "United States", kills: "22.6M", killsNum: 22.6, squad: "Tank" },
+      { server: 1833, rank: 4, name: "Cødy056", alliance: "RoNa", power: 171857571, nationality: "United States", kills: "15.9M", killsNum: 15.9, squad: "Missile" },
+      { server: 1833, rank: 5, name: "Judéx ┗คศ", alliance: "KnRl", power: 170952799, nationality: "Turkey", kills: "19.9M", killsNum: 19.9, squad: "Aircraft" },
+
+      // 1834
+      { server: 1834, rank: 1, name: "I Am DK", alliance: "HOLa", power: 160756477, nationality: "United States", kills: "6.1M", killsNum: 6.1, squad: "Tank" },
+      { server: 1834, rank: 2, name: "Dark Italy", alliance: "TOXC", power: 158911006, nationality: "Germany", kills: "6.4M", killsNum: 6.4, squad: "Tank" },
+      { server: 1834, rank: 3, name: "GeneralMiauSintholor", alliance: "CryL", power: 157874374, nationality: "Germany", kills: "21.4M", killsNum: 21.4, squad: "Missile" },
+      { server: 1834, rank: 4, name: "Hawcha", alliance: "SPIX", power: 150221660, nationality: "Germany", kills: "6.5M", killsNum: 6.5, squad: "Missile" },
+      { server: 1834, rank: 5, name: "Holtyboss", alliance: "SPIX", power: 149993265, nationality: "Germany", kills: "6.9M", killsNum: 6.9, squad: "Aircraft" },
+
+      // 1835
+      { server: 1835, rank: 1, name: "Vescovo1", alliance: "SECD", power: 203881209, nationality: "United States", kills: "58.9M", killsNum: 58.9, squad: "Missile" },
+      { server: 1835, rank: 2, name: "PROOF", alliance: "SECD", power: 192116292, nationality: "United States", kills: "34.5M", killsNum: 34.5, squad: "Tank" },
+      { server: 1835, rank: 3, name: "Nazü", alliance: "SECD", power: 191044995, nationality: "Philippines", kills: "45.8M", killsNum: 45.8, squad: "Missile" },
+      { server: 1835, rank: 4, name: "니모 Nemo", alliance: "SECD", power: 174037294, nationality: "United States", kills: "18.3M", killsNum: 18.3, squad: "Missile" },
+      { server: 1835, rank: 5, name: "West Gran", alliance: "SECD", power: 167764935, nationality: "United States", kills: "7.2M", killsNum: 7.2, squad: "Aircraft" },
+
+      // 1836
+      { server: 1836, rank: 1, name: "にゃかゆぴno爪", alliance: "BONY", power: 180089746, nationality: "Japan", kills: "44.2M", killsNum: 44.2, squad: "Missile" },
+      { server: 1836, rank: 2, name: "ヨダぽよ", alliance: "BONY", power: 151293795, nationality: "Japan", kills: "21.0M", killsNum: 21.0, squad: "Missile" },
+      { server: 1836, rank: 3, name: "フリュFLU", alliance: "BONY", power: 148242231, nationality: "European Union", kills: "14.2M", killsNum: 14.2, squad: "Aircraft" },
+      { server: 1836, rank: 4, name: "おーちゃん2", alliance: "gdmk", power: 144020617, nationality: "Japan", kills: "4.3M", killsNum: 4.3, squad: "Aircraft" },
+      { server: 1836, rank: 5, name: "E M A － X", alliance: "gort", power: 140815305, nationality: "Japan", kills: "5.2M", killsNum: 5.2, squad: "Tank" },
+
+      // 1837
+      { server: 1837, rank: 1, name: "Minh Tuấn NT", alliance: "Vie", power: 194314785, nationality: "Vietnam", kills: "26.7M", killsNum: 26.7, squad: "Missile" },
+      { server: 1837, rank: 2, name: "盲", alliance: "TS79", power: 180314201, nationality: "Hong Kong", kills: "15.8M", killsNum: 15.8, squad: "Tank" },
+      { server: 1837, rank: 3, name: "Thatgirl 1113", alliance: "Vie", power: 176569562, nationality: "Hong Kong", kills: "23.2M", killsNum: 23.2, squad: "Missile" },
+      { server: 1837, rank: 4, name: "史迪崽", alliance: "TS79", power: 173216434, nationality: "Singapore", kills: "19.6M", killsNum: 19.6, squad: "Missile" },
+      { server: 1837, rank: 5, name: "General Papa Kuan", alliance: "TS79", power: 171162855, nationality: "Singapore", kills: "4.5M", killsNum: 4.5, squad: "Missile" },
+
+      // 1838
+      { server: 1838, rank: 1, name: "donKey the whiTe", alliance: "erOs", power: 240623324, nationality: "United States", kills: "32.8M", killsNum: 32.8, squad: "Missile" },
+      { server: 1838, rank: 2, name: "Tarküsx", alliance: "LOVR", power: 185118702, nationality: "United States", kills: "19.1M", killsNum: 19.1, squad: "Tank" },
+      { server: 1838, rank: 3, name: "Dîrty", alliance: "LOVR", power: 183856476, nationality: "Canada", kills: "42.0M", killsNum: 42.0, squad: "Missile" },
+      { server: 1838, rank: 4, name: "♡TwIsT♡ 고름", alliance: "erOs", power: 180619186, nationality: "United States", kills: "14.5M", killsNum: 14.5, squad: "Missile" },
+      { server: 1838, rank: 5, name: "The  Empire", alliance: "LOVR", power: 180432112, nationality: "United States", kills: "22.1M", killsNum: 22.1, squad: "Tank" },
+
+      // 1839
+      { server: 1839, rank: 1, name: "Agen Rahasia 001", alliance: "IDSF", power: 131608029, nationality: "Indonesia", kills: "9.2M", killsNum: 9.2, squad: "Tank" },
+      { server: 1839, rank: 2, name: "Fivin", alliance: "IDSF", power: 130361410, nationality: "Indonesia", kills: "44.1M", killsNum: 44.1, squad: "Tank" },
+      { server: 1839, rank: 3, name: "TOM SOTOY KATA OCTA", alliance: "JR01", power: 129953288, nationality: "Indonesia", kills: "33.7M", killsNum: 33.7, squad: "Aircraft" },
+      { server: 1839, rank: 4, name: "Kalderoon", alliance: "7FA", power: 127586909, nationality: "Turkey", kills: "2.5M", killsNum: 2.5, squad: "Tank" },
+      { server: 1839, rank: 5, name: "b à s t o n", alliance: "JR01", power: 124636601, nationality: "Indonesia", kills: "7.5M", killsNum: 7.5, squad: "Aircraft" },
+
+      // 1840
+      { server: 1840, rank: 1, name: "Mını Dıggz", alliance: "VALY", power: 208984108, nationality: "United States", kills: "42.8M", killsNum: 42.8, squad: "Missile" },
+      { server: 1840, rank: 2, name: "realcbg", alliance: "VALY", power: 187492553, nationality: "Slovakia", kills: "21.7M", killsNum: 21.7, squad: "Tank" },
+      { server: 1840, rank: 3, name: "ErikssonOwtaCtrl", alliance: "VALY", power: 187097169, nationality: "Sweden", kills: "26.4M", killsNum: 26.4, squad: "Missile" },
+      { server: 1840, rank: 4, name: "Hàdés", alliance: "VALY", power: 186808211, nationality: "United Kingdom", kills: "26.9M", killsNum: 26.9, squad: "Missile" },
+      { server: 1840, rank: 5, name: "MyLady Coconut", alliance: "VALY", power: 172238798, nationality: "Germany", kills: "32.4M", killsNum: 32.4, squad: "Tank" },
+
+      // 1841
+      { server: 1841, rank: 1, name: "가로 Garo", alliance: "BKW1", power: 192166237, nationality: "South Korea", kills: "21.1M", killsNum: 21.1, squad: "Tank", note: "Not welcome in 1848" },
+      { server: 1841, rank: 2, name: "GeneralShenanigan", alliance: "4RGD", power: 192104010, nationality: "United States", kills: "28.7M", killsNum: 28.7, squad: "Missile" },
+      { server: 1841, rank: 3, name: "OTW1", alliance: "4RGD", power: 191456560, nationality: "United States", kills: "19.8M", killsNum: 19.8, squad: "Aircraft" },
+      { server: 1841, rank: 4, name: "협착안전", alliance: "BKW1", power: 183059176, nationality: "South Korea", kills: "16.0M", killsNum: 16.0, squad: "Aircraft" },
+      { server: 1841, rank: 5, name: "alli♡", alliance: "4RGD", power: 173684362, nationality: "United States", kills: "24.7M", killsNum: 24.7, squad: "Tank" },
+
+      // 1842
+      { server: 1842, rank: 1, name: "창근님", alliance: "KZOO", power: 241277089, nationality: "South Korea", kills: "33.2M", killsNum: 33.2, squad: "Missile" },
+      { server: 1842, rank: 2, name: "H Zikka", alliance: "KZOO", power: 218772064, nationality: "South Korea", kills: "79.5M", killsNum: 79.5, squad: "Missile" },
+      { server: 1842, rank: 3, name: "Faker Ahri", alliance: "KZOO", power: 216621118, nationality: "South Korea", kills: "39.1M", killsNum: 39.1, squad: "Tank" },
+      { server: 1842, rank: 4, name: "Aggamotto", alliance: "RGoP", power: 183196160, nationality: "United States", kills: "8.6M", killsNum: 8.6, squad: "Aircraft" },
+      { server: 1842, rank: 5, name: "디핑 Dipping", alliance: "KZOO", power: 180827870, nationality: "South Korea", kills: "19.9M", killsNum: 19.9, squad: "Missile" },
+
+      // 1843
+      { server: 1843, rank: 1, name: "Kei kayzo sec", alliance: "SEC3", power: 188975691, nationality: "Japan", kills: "49.2M", killsNum: 49.2, squad: "Missile" },
+      { server: 1843, rank: 2, name: "ピクミー", alliance: "SEC3", power: 174095809, nationality: "Japan", kills: "24.3M", killsNum: 24.3, squad: "Missile" },
+      { server: 1843, rank: 3, name: "のがわ", alliance: "DxT", power: 170916479, nationality: "Japan", kills: "20.7M", killsNum: 20.7, squad: "Missile" },
+      { server: 1843, rank: 4, name: "tiki84", alliance: "Rion", power: 167184153, nationality: "Japan", kills: "12.3M", killsNum: 12.3, squad: "Missile" },
+      { server: 1843, rank: 5, name: "健介Ω", alliance: "YMSC", power: 162436821, nationality: "Japan", kills: "7.4M", killsNum: 7.4, squad: "Tank" },
+
+      // 1844
+      { server: 1844, rank: 1, name: "BODY SNATCHER", alliance: "BPI", power: 199883252, nationality: "United Kingdom", kills: "45.1M", killsNum: 45.1, squad: "Tank" },
+      { server: 1844, rank: 2, name: "Tennō Ben", alliance: "BPI", power: 198026672, nationality: "Palestine", kills: "26.3M", killsNum: 26.3, squad: "Tank", note: "Speaks English & French in profile" },
+      { server: 1844, rank: 3, name: "bsKjelly", alliance: "BPI", power: 195920631, nationality: "Portugal", kills: "38.6M", killsNum: 38.6, squad: "Missile" },
+      { server: 1844, rank: 4, name: "Calleᴰˢᴷʸ", alliance: "BPI", power: 171571233, nationality: "Germany", kills: "31.1M", killsNum: 31.1, squad: "Aircraft" },
+      { server: 1844, rank: 5, name: "Julelys", alliance: "BPI", power: 171556958, nationality: "Norway", kills: "24.8M", killsNum: 24.8, squad: "Missile" },
+
+      // 1845
+      { server: 1845, rank: 1, name: "술쉔", alliance: "RALT", power: 153763117, nationality: "South Korea", kills: "7.0M", killsNum: 7.0, squad: "Aircraft" },
+      { server: 1845, rank: 2, name: "BAoN", alliance: "RALT", power: 150467864, nationality: "South Korea", kills: "10.7M", killsNum: 10.7, squad: "Aircraft" },
+      { server: 1845, rank: 3, name: "albert3498", alliance: "Suge", power: 148289972, nationality: "No flag", kills: "9.8M", killsNum: 9.8, squad: "Tank" },
+      { server: 1845, rank: 4, name: "ILDAN68", alliance: "RALT", power: 147614453, nationality: "South Korea", kills: "1.7M", killsNum: 1.7, squad: "Tank" },
+      { server: 1845, rank: 5, name: "晴天又花の丸", alliance: "Suge", power: 146789234, nationality: "No flag", kills: "16.0M", killsNum: 16.0, squad: "Aircraft" },
+
+      // 1846
+      { server: 1846, rank: 1, name: "은파 Silvery Waves", alliance: "KoiN", power: 162207858, nationality: "South Korea", kills: "12.3M", killsNum: 12.3, squad: "Missile" },
+      { server: 1846, rank: 2, name: "돌맹이79", alliance: "BKBX", power: 156563630, nationality: "South Korea", kills: "26.0M", killsNum: 26.0, squad: "Aircraft" },
+      { server: 1846, rank: 3, name: "KMA27", alliance: "SOUR", power: 154579059, nationality: "United States", kills: "3.1M", killsNum: 3.1, squad: "Tank" },
+      { server: 1846, rank: 4, name: "QUeen Z", alliance: "BKBX", power: 141847314, nationality: "No flag", kills: "6.7M", killsNum: 6.7, squad: "Tank" },
+      { server: 1846, rank: 5, name: "Coolit Down Champ", alliance: "BKBX", power: 133235940, nationality: "United States", kills: "2.2M", killsNum: 2.2, squad: "Aircraft" },
+
+      // 1847
+      { server: 1847, rank: 1, name: "rzhaanQ8", alliance: "DIAR", power: 182327092, nationality: "Kuwait", kills: "22.2M", killsNum: 22.2, squad: "Missile" },
+      { server: 1847, rank: 2, name: "قاهرهم", alliance: "DIAR", power: 179792540, nationality: "Saudi Arabia", kills: "23.7M", killsNum: 23.7, squad: "Aircraft" },
+      { server: 1847, rank: 3, name: "NAIFˢᵖʳ", alliance: "DIAR", power: 160921775, nationality: "Saudi Arabia", kills: "39.8M", killsNum: 39.8, squad: "Aircraft" },
+      { server: 1847, rank: 4, name: "Yifˢᵖʳ", alliance: "DIAR", power: 147098087, nationality: "Saudi Arabia", kills: "6.7M", killsNum: 6.7, squad: "Missile" },
+      { server: 1847, rank: 5, name: "SФЦLMДГΞ", alliance: "DIAR", power: 145301991, nationality: "Saudi Arabia", kills: "3.6M", killsNum: 3.6, squad: "Tank" },
+
+      // 1849
+      { server: 1849, rank: 1, name: "Damian Roman", alliance: "DKNX", power: 182082900, nationality: "Poland", kills: "13.9M", killsNum: 13.9, squad: "Aircraft" },
+      { server: 1849, rank: 2, name: "Johnmatrix", alliance: "ROE", power: 179312153, nationality: "United Kingdom", kills: "19.6M", killsNum: 19.6, squad: "Tank" },
+      { server: 1849, rank: 3, name: "Caerlud", alliance: "PoFR", power: 177236960, nationality: "Wales", kills: "4.3M", killsNum: 4.3, squad: "Tank" },
+      { server: 1849, rank: 4, name: "Bokowicz", alliance: "PoFR", power: 166220210, nationality: "Poland", kills: "20.7M", killsNum: 20.7, squad: "Tank" },
+      { server: 1849, rank: 5, name: "ʳʰᵘᵐ Aky", alliance: "ROE", power: 151897180, nationality: "France", kills: "2.9M", killsNum: 2.9, squad: "Tank" },
+
+      // 1850
+      { server: 1850, rank: 1, name: "Albatross9999", alliance: "Xcat", power: 292601249, nationality: "Thailand", kills: "83.1M", killsNum: 83.1, squad: "Aircraft" },
+      { server: 1850, rank: 2, name: "Ox Lucas", alliance: "FAON", power: 273783415, nationality: "Hong Kong", kills: "67.5M", killsNum: 67.5, squad: "Tank" },
+      { server: 1850, rank: 3, name: "ちはち", alliance: "Xcat", power: 258444701, nationality: "Japan", kills: "51.3M", killsNum: 51.3, squad: "Aircraft" },
+      { server: 1850, rank: 4, name: "きたろうqwertgfd", alliance: "FAON", power: 235596399, nationality: "Japan", kills: "33.8M", killsNum: 33.8, squad: "Tank" },
+      { server: 1850, rank: 5, name: "水藍色的浪漫", alliance: "FAON", power: 196624900, nationality: "No flag", kills: "13.5M", killsNum: 13.5, squad: "Missile" },
+
+      // 1852
+      { server: 1852, rank: 1, name: "Obemma", alliance: "Goh", power: 244621875, nationality: "Australia", kills: "97.6M", killsNum: 97.6, squad: "Tank" },
+      { server: 1852, rank: 2, name: "CaptainPePPer", alliance: "Goh", power: 211311319, nationality: "Germany", kills: "54.8M", killsNum: 54.8, squad: "Missile" },
+      { server: 1852, rank: 3, name: "脆皮章魚燒", alliance: "Goh", power: 190689590, nationality: "No flag", kills: "31.1M", killsNum: 31.1, squad: "Missile" },
+      { server: 1852, rank: 4, name: "3K fam", alliance: "Goh", power: 188596869, nationality: "Hong Kong", kills: "26.4M", killsNum: 26.4, squad: "Missile" },
+      { server: 1852, rank: 5, name: "DUCKY 鸭鸭", alliance: "Goh", power: 185937617, nationality: "Malaysia", kills: "31.8M", killsNum: 31.8, squad: "Tank" },
+
+      // 1853
+      { server: 1853, rank: 1, name: "MALIKk", alliance: "QTTL", power: 258793679, nationality: "Saudi Arabia", kills: "68.8M", killsNum: 68.8, squad: "Tank" },
+      { server: 1853, rank: 2, name: "TUNA ᵀʰᵉ HUN", alliance: "VCN", power: 204654906, nationality: "United Arab Emirates", kills: "38.5M", killsNum: 38.5, squad: "Missile" },
+      { server: 1853, rank: 3, name: "OSAMA5253", alliance: "QTTL", power: 203178468, nationality: "Saudi Arabia", kills: "35.9M", killsNum: 35.9, squad: "Missile" },
+      { server: 1853, rank: 4, name: "xBasel", alliance: "DzR", power: 202920765, nationality: "Saudi Arabia", kills: "28.1M", killsNum: 28.1, squad: "Tank" },
+      { server: 1853, rank: 5, name: "آرنب لطيف", alliance: "QTTL", power: 201832290, nationality: "Saudi Arabia", kills: "55.9M", killsNum: 55.9, squad: "Missile" },
+
+      // 1854
+      { server: 1854, rank: 1, name: "sharkattack9", alliance: "RXEY", power: 190876668, nationality: "Saudi Arabia", kills: "16.6M", killsNum: 16.6, squad: "Tank" },
+      { server: 1854, rank: 2, name: "1337 glhf", alliance: "RXEY", power: 171461679, nationality: "European Union", kills: "34.9M", killsNum: 34.9, squad: "Aircraft" },
+      { server: 1854, rank: 3, name: "Wakka", alliance: "RXEY", power: 162039407, nationality: "England", kills: "18.5M", killsNum: 18.5, squad: "Tank" },
+      { server: 1854, rank: 4, name: "SĀL", alliance: "RXEY", power: 157365023, nationality: "Saudi Arabia", kills: "26.0M", killsNum: 26.0, squad: "Tank" },
+      { server: 1854, rank: 5, name: "Lacostaa1", alliance: "LEAT", power: 156883162, nationality: "Poland", kills: "26.4M", killsNum: 26.4, squad: "Aircraft" },
+
+      // 1855
+      { server: 1855, rank: 1, name: "Thor1855", alliance: "EChO", power: 262747611, nationality: "United States", kills: "18.6M", killsNum: 18.6, squad: "Missile" },
+      { server: 1855, rank: 2, name: "시쿠 siku", alliance: "KoDe", power: 226247370, nationality: "South Korea", kills: "39.6M", killsNum: 39.6, squad: "Missile" },
+      { server: 1855, rank: 3, name: "워리어ᴷᴬᴺ", alliance: "KoDe", power: 184300446, nationality: "South Korea", kills: "20.4M", killsNum: 20.4, squad: "Missile" },
+      { server: 1855, rank: 4, name: "Augustus100", alliance: "eDMG", power: 179328277, nationality: "United States", kills: "13.9M", killsNum: 13.9, squad: "Tank" },
+      { server: 1855, rank: 5, name: "♡ Zara ♡", alliance: "KoDe", power: 175794533, nationality: "South Korea", kills: "29.2M", killsNum: 29.2, squad: "Tank" },
+
+      // 1856
+      { server: 1856, rank: 1, name: "메모리스 MEMORY", alliance: "FRGD", power: 295116650, nationality: "South Korea", kills: "53.6M", killsNum: 53.6, squad: "Tank" },
+      { server: 1856, rank: 2, name: "도핑 Doping", alliance: "GoTA", power: 283317918, nationality: "South Korea", kills: "68.0M", killsNum: 68.0, squad: "Tank" },
+      { server: 1856, rank: 3, name: "Hitman JY", alliance: "GoTA", power: 184556534, nationality: "South Korea", kills: "18.9M", killsNum: 18.9, squad: "Missile" },
+      { server: 1856, rank: 4, name: "Mix Jab믹 펀치", alliance: "FRGD", power: 179873356, nationality: "United States", kills: "36.0M", killsNum: 36.0, squad: "Tank" },
+      { server: 1856, rank: 5, name: "c2c8f29b", alliance: "FRGD", power: 173863083, nationality: "South Korea", kills: "17.5M", killsNum: 17.5, squad: "Missile" },
+
+      // 1857
+      { server: 1857, rank: 1, name: "بو كرم", alliance: "ArBs", power: 236894910, nationality: "United Arab Emirates", kills: "25.1M", killsNum: 25.1, squad: "Missile" },
+      { server: 1857, rank: 2, name: "سمو · Lawyer", alliance: "ArBs", power: 220039513, nationality: "Saudi Arabia", kills: "64.0M", killsNum: 64.0, squad: "Aircraft" },
+      { server: 1857, rank: 3, name: "Bomo SA", alliance: "ArBs", power: 204245991, nationality: "Saudi Arabia", kills: "37.0M", killsNum: 37.0, squad: "Tank" },
+      { server: 1857, rank: 4, name: "ABU  ALANOUD", alliance: "wuw", power: 192286780, nationality: "Saudi Arabia", kills: "52.3M", killsNum: 52.3, squad: "Missile" },
+      { server: 1857, rank: 5, name: "Bhasudewa", alliance: "IDm", power: 190279933, nationality: "Turkey", kills: "13.2M", killsNum: 13.2, squad: "Aircraft" },
+
+      // 1858
+      { server: 1858, rank: 1, name: "NemesisMegaBlastoise", alliance: "FLAG", power: 196680068, nationality: "United States", kills: "18.6M", killsNum: 18.6, squad: "Tank" },
+      { server: 1858, rank: 2, name: "sam69120", alliance: "FLAG", power: 149692088, nationality: "United States", kills: "2.1M", killsNum: 2.1, squad: "Aircraft" },
+      { server: 1858, rank: 3, name: "Loki1858", alliance: "FLAG", power: 147522533, nationality: "United States", kills: "11.8M", killsNum: 11.8, squad: "Aircraft" },
+      { server: 1858, rank: 4, name: "nienettˢᵏʷˢ", alliance: "Skws", power: 144960291, nationality: "United States", kills: "8.2M", killsNum: 8.2, squad: "Tank" },
+      { server: 1858, rank: 5, name: "atEr ᴴᴼᴸᵃ", alliance: "FLAG", power: 144157412, nationality: "United States", kills: "3.5M", killsNum: 3.5, squad: "Tank" },
+
+      // 1859 (Nationality & Kills TBD)
+      { server: 1859, rank: 1, name: "Tunaman44", alliance: "FkFO", power: 162354034, nationality: "TBD", kills: "TBD", killsNum: -1, squad: "Aircraft" },
+      { server: 1859, rank: 2, name: "KoldSteel1", alliance: "FkFO", power: 158230167, nationality: "TBD", kills: "TBD", killsNum: -1, squad: "Tank" },
+      { server: 1859, rank: 3, name: "Captain Soleil", alliance: "FkFO", power: 151429086, nationality: "TBD", kills: "TBD", killsNum: -1, squad: "Aircraft" },
+      { server: 1859, rank: 4, name: "Lord FitNDN Weapon X", alliance: "DBDH", power: 145854261, nationality: "TBD", kills: "TBD", killsNum: -1, squad: "Missile" },
+      { server: 1859, rank: 5, name: "jbrey", alliance: "FkFO", power: 144170370, nationality: "TBD", kills: "TBD", killsNum: -1, squad: "Missile" },
+
+      // 1860 (Main Squad TBD)
+      { server: 1860, rank: 1, name: "お侍しゃん", alliance: "RNRN", power: 187608407, nationality: "Japan", kills: "28.7M", killsNum: 28.7, squad: "TBD" },
+      { server: 1860, rank: 2, name: "ぽんちゃん PON", alliance: "RNRN", power: 173873569, nationality: "Spain", kills: "13.1M", killsNum: 13.1, squad: "TBD" },
+      { server: 1860, rank: 3, name: "ろにーちゃん", alliance: "RNRN", power: 171350159, nationality: "Japan", kills: "16.7M", killsNum: 16.7, squad: "TBD" },
+      { server: 1860, rank: 4, name: "MocciMocci", alliance: "RNRN", power: 170477332, nationality: "Spain", kills: "24.9M", killsNum: 24.9, squad: "TBD" },
+      { server: 1860, rank: 5, name: "KK hello work", alliance: "RNRN", power: 169981495, nationality: "Japan", kills: "24.0M", killsNum: 24.0, squad: "TBD" }
+    ];
+
+    let selectedId = null;
+    const fmtPower = (n) => n.toLocaleString("en-US");
+
+    function populateFilters() {
+      const serverSelect = document.getElementById("serverFilter");
+      const servers = [...new Set(players.map((p) => p.server))].sort((a, b) => a - b);
+      servers.forEach((s) => {
+        const opt = document.createElement("option");
+        opt.value = String(s);
+        opt.textContent = `Server #${s}`;
+        serverSelect.appendChild(opt);
+      });
+
+      const countrySelect = document.getElementById("countryFilter");
+      const countries = [...new Set(players.map((p) => p.nationality))].sort((a, b) => a.localeCompare(b));
+      countries.forEach((c) => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        countrySelect.appendChild(opt);
+      });
+    }
+
+    function getFilteredPlayers() {
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const srv = document.getElementById("serverFilter").value;
+      const sqd = document.getElementById("squadFilter").value;
+      const cnt = document.getElementById("countryFilter").value;
+      const sort = document.getElementById("sortSelect").value;
+
+      let list = players.filter((p) => {
+        const matchSrv = srv === "ALL" || String(p.server) === srv;
+        const matchSqd = sqd === "ALL" || p.squad === sqd;
+        const matchCnt = cnt === "ALL" || p.nationality === cnt;
+        const matchText =
+          !q ||
+          p.name.toLowerCase().includes(q) ||
+          p.alliance.toLowerCase().includes(q) ||
+          p.nationality.toLowerCase().includes(q) ||
+          String(p.server).includes(q) ||
+          (p.note && p.note.toLowerCase().includes(q));
+        return matchSrv && matchSqd && matchCnt && matchText;
+      });
+
+      if (sort === "powerDesc") {
+        list.sort((a, b) => b.power - a.power);
+      } else if (sort === "killsDesc") {
+        list.sort((a, b) => b.killsNum - a.killsNum);
+      } else {
+        list.sort((a, b) => a.server - b.server || a.rank - b.rank);
+      }
+
+      return list;
+    }
+
+    function renderStats(list) {
+      const statsBar = document.getElementById("statsBar");
+      const total = list.length;
+      const avgPower = total ? Math.round(list.reduce((acc, p) => acc + p.power, 0) / total) : 0;
+      const counts = { Tank: 0, Aircraft: 0, Missile: 0 };
+      list.forEach((p) => {
+        if (counts[p.squad] !== undefined) counts[p.squad]++;
+      });
+
+      statsBar.innerHTML = `
+        <div class="stat-card"><div class="label">Players Shown</div><div class="val">${total}</div></div>
+        <div class="stat-card"><div class="label">Avg Power</div><div class="val">${total ? fmtPower(avgPower) : "-"}</div></div>
+        <div class="stat-card"><div class="label">Tank Mains</div><div class="val" style="color:var(--tank)">${counts.Tank}</div></div>
+        <div class="stat-card"><div class="label">Aircraft Mains</div><div class="val" style="color:var(--air)">${counts.Aircraft}</div></div>
+        <div class="stat-card"><div class="label">Missile Mains</div><div class="val" style="color:var(--missile)">${counts.Missile}</div></div>
+      `;
+    }
+
+    function renderInspector(p) {
+      const box = document.getElementById("inspector");
+      if (!p) {
+        box.innerHTML = `<h2>Player Details</h2><p class="empty-msg">Tap or click a player row to inspect their full profile.</p>`;
+        return;
+      }
+
+      box.innerHTML = `
+        <h2>[${p.alliance}] ${p.name}</h2>
+        <div class="field"><span>Server</span><span>#${p.server}</span></div>
+        <div class="field"><span>Server Rank</span><span>#${p.rank}</span></div>
+        <div class="field"><span>Power</span><span>${fmtPower(p.power)}</span></div>
+        <div class="field"><span>Main Squad</span><span>${p.squad}</span></div>
+        <div class="field"><span>Nationality</span><span>${p.nationality}</span></div>
+        <div class="field"><span>Kills</span><span>${p.kills}</span></div>
+        ${p.note ? `<div class="note-box"><strong>Intel Note:</strong> ${p.note}</div>` : ""}
+      `;
+    }
+
+    function render() {
+      const list = getFilteredPlayers();
+      const tbody = document.getElementById("tableBody");
+      document.getElementById("countLabel").textContent = `${list.length} player${list.length === 1 ? "" : "s"}`;
+      renderStats(list);
+
+      tbody.innerHTML = list
+        .map((p) => {
+          const id = `${p.server}-${p.rank}`;
+          const activeClass = selectedId === id ? "active" : "";
+          const rankClass = p.rank <= 3 ? `rank-${p.rank}` : "";
+          return `
+            <tr class="${activeClass}" data-id="${id}">
+              <td>#${p.server}</td>
+              <td class="${rankClass}">#${p.rank}</td>
+              <td><strong>${p.name}</strong></td>
+              <td>[${p.alliance}]</td>
+              <td>${fmtPower(p.power)}</td>
+              <td><span class="badge sq-${p.squad}">${p.squad}</span></td>
+              <td>${p.nationality}</td>
+              <td>${p.kills}</td>
+            </tr>
+          `;
+        })
+        .join("");
+
+      tbody.querySelectorAll("tr").forEach((tr) => {
+        tr.addEventListener("click", () => {
+          const id = tr.getAttribute("data-id");
+          selectedId = id;
+          const found = players.find((x) => `${x.server}-${x.rank}` === id);
+          renderInspector(found);
+          render();
+        });
+      });
+    }
+
+    populateFilters();
+    ["searchInput", "serverFilter", "squadFilter", "countryFilter", "sortSelect"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", render);
+      document.getElementById(id).addEventListener("change", render);
+    });
+
+    render();
+  </script>
+</body>
+</html>
